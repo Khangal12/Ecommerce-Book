@@ -1,49 +1,87 @@
-import React from "react";
+import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Box from "@mui/material/Box";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
+import Button from "@mui/material/Button";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 import CssBaseline from "@mui/material/CssBaseline";
 import Sidebar from "./Sidebar";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const drawerWidth = 200; // Adjust drawer width if needed
+const drawerWidth = 200;
 
 export default function Layout() {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box
+      sx={{
+        display: "grid",
+        gridTemplateColumns: `${drawerWidth}px 1fr`,
+        gridTemplateRows: "auto 1fr",
+        height: "100vh",
+        overflow: "hidden",
+      }}
+    >
       <CssBaseline />
       <AppBar
         position="fixed"
         sx={{
-          width: `calc(100% - ${drawerWidth}px)`,
-          ml: `${drawerWidth}px`,
-          bgcolor: "#1976d2",
+          gridColumn: "1 / span 2",
+          bgcolor: "white",
         }}
       >
-        <Toolbar>
-          <IconButton
-            aria-label="open drawer"
-            edge="end"
-            sx={{ display: { sm: "none" } }}
+        <Toolbar sx={{ display: "flex", justifyContent: "end" }}>
+          <Button
+            aria-controls={open ? "user-menu" : undefined}
+            aria-haspopup="true"
+            aria-expanded={open ? "true" : undefined}
+            onClick={handleMenuOpen}
           >
-            <MenuIcon />
-          </IconButton>
+            <AccountCircleIcon sx={{ color: "black", fontSize: 30 }} />
+          </Button>
+          <Menu
+            id="user-menu"
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleMenuClose}
+            MenuListProps={{
+              "aria-labelledby": "user-menu-button",
+            }}
+          >
+            <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+            <MenuItem onClick={handleMenuClose}>My Account</MenuItem>
+            <MenuItem onClick={handleMenuClose}>Logout</MenuItem>
+          </Menu>
         </Toolbar>
       </AppBar>
-      <Sidebar sx={{ width: drawerWidth }} />
+      <Sidebar sx={{ gridRow: "2", gridColumn: "1" }} />
       <Box
         component="main"
         sx={{
-          flexGrow: 1,
+          gridRow: "2",
+          gridColumn: "2",
+          mt: 10,
           p: 5,
-          marginLeft: `${drawerWidth}px`,
+          overflowY: "auto",
         }}
       >
-        <Toolbar />
-        <Outlet /> {/* Render nested routes */}
+        <Outlet />
       </Box>
+      <ToastContainer />
     </Box>
   );
 }
