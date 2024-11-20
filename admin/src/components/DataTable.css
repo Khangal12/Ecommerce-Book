@@ -1,0 +1,11 @@
+.sticky-column {
+    position: sticky;
+    right: 0;
+    background-color: white; /* Match the table's background */
+    z-index: 1;
+  }
+  
+  .MuiDataGrid-cell {
+    overflow: visible; /* Ensure cell content is fully visible */
+  }
+  
