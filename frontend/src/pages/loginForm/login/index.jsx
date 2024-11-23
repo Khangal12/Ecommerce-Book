@@ -3,14 +3,17 @@ import React, { useState } from 'react';
 import { Box, Grid, TextField, Button, FormControlLabel, Checkbox, Link, Typography } from '@mui/material';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import GoogleIcon from '@mui/icons-material/Google';
-import loginPhoto from '../assets/login.png';
 import { useNavigate } from 'react-router-dom';
+import useApi from '../../../useApi';
 const Login = () => {
-    const [username, setUsername] = useState('');
+    const loginPhoto = '/assets/login.png'
+    const [email, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [rememberMe, setRememberMe] = useState(true);
-
+    const {apiCallWithToast , loading} = useApi()
     const navigate = useNavigate(); 
+
+    
 
     const handleUsernameChange = (event) => {
         setUsername(event.target.value);
@@ -23,18 +26,34 @@ const Login = () => {
     const handleCheckboxChange = (event) => {
         setRememberMe(event.target.checked);
     };
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        console.log('Username:', username);
-        console.log('Password:', password);
-        console.log('Remember Me:', rememberMe);
+    
+        // Create a new FormData object and append the data
+        const formData = new FormData();
+        formData.append('email', email);
+        formData.append('password', password);
+
+    
+        try {
+            const response = apiCallWithToast('http://127.0.0.1:5000/login/', {
+                method: 'POST',
+                data: formData, // Send the FormData object as the body
+            });
+    
+        } catch (error) {
+            console.error('Error:', error);
+            // Handle network error
+        }
     };
+    
     const handleSignUpRedirect = () => {
         navigate('/signUp');  
     };
     const handleResetPassword=()=>{
         navigate('/resetPassword')
     }
+    
     return (
         <Box sx={{
             display: 'flex',      
@@ -64,12 +83,12 @@ const Login = () => {
                     </Box>
 
                     <TextField
-                        id="username"
+                        id="email"
                         label="Нэвтрэх нэр"
                         variant="outlined"
                         fullWidth
                         margin="normal"
-                        value={username}
+                        value={email}
                         onChange={handleUsernameChange}
                     />
 

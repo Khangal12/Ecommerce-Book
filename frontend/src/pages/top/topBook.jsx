@@ -1,6 +1,5 @@
 import React from "react";
 import { Box, Typography, Card, CardContent, CardMedia, Grid } from "@mui/material";
-import Book from '../assets/book.png';
 
 const TopBooks = () => {
   const books = [
@@ -8,7 +7,7 @@ const TopBooks = () => {
       title: "The Great Gatsby",
       author: "F. Scott Fitzgerald",
       description: "A novel about the American dream and the disillusionment of society in the 1920s.",
-      imageUrl: Book,
+      imageUrl: 'Book',
     },
   ];
 
