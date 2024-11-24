@@ -5,6 +5,7 @@ from flask_migrate import Migrate
 from backend.config import config
 from backend.models import db, Book
 from backend.routes.admin import admin_bp
+from backend.routes.login import login_bp
 from dotenv import load_dotenv
 from flask_cors import CORS
 
@@ -20,8 +21,9 @@ def create_app(config_name="development"):
         return send_from_directory(os.path.join(app.root_path, 'files', 'book_images'), filename)
 
     # Enable CORS
-    CORS(app, origins=["http://localhost:3000"])  # Assuming frontend is on localhost:3000
+    CORS(app, origins=["http://localhost:3000"])
     CORS(admin_bp, origins=["http://localhost:3000"])
+    CORS(login_bp,origins=["http://localhost:3000"])
 
     # Load configuration
     app.config.from_object(config[config_name])
@@ -32,6 +34,7 @@ def create_app(config_name="development"):
 
     # Register blueprints
     app.register_blueprint(admin_bp)
+    app.register_blueprint(login_bp)
 
     return app
 
