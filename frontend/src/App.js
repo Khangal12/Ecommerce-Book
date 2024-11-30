@@ -9,6 +9,7 @@ import Login from './pages/loginForm/login';
 import ResetPassword from './pages/loginForm/resetPassword/resetPassword';
 import HomePage from './pages/home/home';
 import Filter from './pages/Filter';
+import Detail from "./pages/Detail";
 
 // Import AppLayout
 import AppLayout from './components/Layout';
@@ -21,6 +22,7 @@ function App() {
           <Route path="/" element={<AppLayout />}>
             <Route index element={<HomePage />} />
             <Route path="/books" element={<Filter />} />
+            <Route path='/books/:id' element={<Detail/>} />
             <Route path="/top" element={<Filter />} />
           </Route>
           <Route path="/signUp" element={<SignUp />} />

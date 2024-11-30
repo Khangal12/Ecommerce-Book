@@ -10,13 +10,14 @@ import {
   Pagination,
   CircularProgress,
 } from "@mui/material";
-
+import { useNavigate } from "react-router-dom";
 const ECommercePage = () => {
   const [filters, setFilters] = useState({
     author: [],
     category: [],
     priceRange: [],
   });
+  const navigate = useNavigate();
 
   const [currentPage, setCurrentPage] = useState(1);
   const [books, setBooks] = useState([]); // Initialize as an empty array
@@ -62,6 +63,10 @@ const ECommercePage = () => {
     fetchBooks();
   }, [filters, currentPage]);
 
+  const handleCardClick = (product) => {
+    navigate(`/books/${product.id}`, { state: { book: product } });
+  };
+
   return (
     <Box sx={{ display: "flex", flexDirection: "row", gap: 10 }}>
       <Box sx={{ width: 250, padding: 2 }}>
@@ -89,7 +94,10 @@ const ECommercePage = () => {
               ) : (
                 books.map((product) => (
                   <Grid item xs={12} sm={6} md={4} key={product.id}>
-                    <Card>
+                    <Card
+                      onClick={() => handleCardClick(product)}
+                      sx={{ cursor: "pointer" }}
+                    >
                       <CardMedia
                         component="img"
                         height="300"
@@ -113,18 +121,19 @@ const ECommercePage = () => {
                         <Typography variant="caption">
                           {product.author}
                         </Typography>
-                        <Typography variant="body5"
-                         sx={{
+                        <Typography
+                          variant="body5"
+                          sx={{
                             display: "block",
                             whiteSpace: "nowrap",
                             overflow: "hidden",
                             textOverflow: "ellipsis",
                             width: "100%",
-                            marginTop:1
-                          }}>
+                            marginTop: 1,
+                          }}
+                        >
                           ₮{product.price}
                         </Typography>
-                        
                       </CardContent>
                     </Card>
                   </Grid>
