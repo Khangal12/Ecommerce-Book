@@ -66,3 +66,33 @@ def signUp():
         except Exception as e:
             current_app.logger.error(f"Error during sign-up: {traceback.format_exc()}")
             return jsonify({"status": "error", "message": "Алдаа", "error": str(e)}), 402
+# @login_bp.route('/resetPassword/', methods=['POST'])
+# def resetPassword():
+#     with current_app.app_context():
+#         try:
+#             data = request.form
+#             email = data.get('email')
+#             username = data.get('username')
+#             address = data.get('address')
+#             password = data.get('password')
+#             phone_number = data.get('phone_number')
+
+           
+#             if User.query.filter_by(email!=email).first():
+#                 return jsonify({"status": "error", "message": "И-мэйл хаяг олдсонгүй"}), 409
+
+          
+
+#             # Hash the password
+#             hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+
+#             # Create a new user
+#             newUser = User(email=email, password=hashed_password, username=username, address=address, phone_number=phone_number)
+#             db.session.add(newUser)
+#             db.session.commit()
+
+#             return jsonify({"status": "success", "message": "Хэрэглэгч амжиллтай бүртгэгдлээ"}), 200
+
+#         except Exception as e:
+#             current_app.logger.error(f"Error during sign-up: {traceback.format_exc()}")
+#             return jsonify({"status": "error", "message": "Алдаа", "error": str(e)}), 402

@@ -26,7 +26,6 @@ const ResetPassword = () => {
             alert("Бүх талбарыг бөглөнө үү.");
             return;
         }
-        console.log('Username:', username);
         console.log('Email:', email);
         console.log('Verification Code:', verificationCode);
         console.log('Password:', password);
@@ -55,16 +54,6 @@ const ResetPassword = () => {
                         Нууц үгээ сэргээх
                     </Typography>
 
-                    {/* Username Field */}
-                    <TextField
-                        id="username"
-                        label="Хэрэглэгчийн нэр"
-                        variant="outlined"
-                        fullWidth
-                        margin="normal"
-                        value={username}
-                        onChange={handleUsernameChange}
-                    />
 
                     {/* Email Field */}
                     <TextField
@@ -131,7 +120,7 @@ const ResetPassword = () => {
               
 
                     <Button variant="contained" fullWidth sx={{ marginTop: 2 }} onClick={handleSubmit}>
-                        Бүртгүүлэх
+                        Үргэлжлүүлэх
                     </Button>
 
                     <Grid container spacing={1} sx={{ marginTop: 2 }} alignItems="center">

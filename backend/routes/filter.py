@@ -4,7 +4,7 @@ import traceback
 
 filter_bp = Blueprint('filter', __name__)
 
-@filter_bp.route('/categories', methods=['GET'])
+@filter_bp.route('/categories/', methods=['GET'])
 def get_categories():
     with current_app.app_context():
         try:

@@ -15,7 +15,7 @@ const FilterSidebar = ({ filters, onFilterChange }) => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:5000/categories"); 
+        const response = await axios.get("http://127.0.0.1:5000/categories/"); 
         setCategories(response.data?.categories); 
         setAuthors(response.data?.authors);
         setLoading(false);  // Set loading to false once the data is fetched

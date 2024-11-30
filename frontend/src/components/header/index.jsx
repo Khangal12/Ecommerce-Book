@@ -20,11 +20,13 @@ import { useUser } from "../../context/UserContext";
 import { toast } from "react-toastify"; // Import toast
 
 const Header = () => {
-  const [value, setValue] = React.useState("1");
+  // "Ном" хуудас нь эхний хуудас байх ёстой гэдэг утга.
+  const [value, setValue] = React.useState("2");
   const [anchorEl, setAnchorEl] = useState(null); // For the dropdown menu
   const navigate = useNavigate();
   const { user , logout} = useUser(); // Assuming user context provides user info
 
+  // Tab сонголт өөрчлөгдөх үед утга шинэчлэх функц
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
@@ -46,10 +48,11 @@ const Header = () => {
 
   return (
     <Box sx={{ paddingBottom: 2 }}>
-      {/* AppBar Header */}
+      {/* AppBar - Дээд талын хэсэг */}
       <AppBar position="static" color="transparent" sx={{ px: 6 }}>
         <Toolbar>
           <Grid container alignItems="center" spacing={2}>
+            {/* Лого */}
             <Grid item xs={3}>
               <Typography
                 variant="h4"
@@ -59,6 +62,8 @@ const Header = () => {
                 E-Book
               </Typography>
             </Grid>
+
+            {/* Хайлтын талбар */}
             <Grid item xs={7}>
               <Box
                 sx={{
@@ -88,6 +93,8 @@ const Header = () => {
                 </IconButton>
               </Box>
             </Grid>
+
+            {/* Багц */}
             <Grid item xs={1}>
               <IconButton
                 sx={{
@@ -99,6 +106,8 @@ const Header = () => {
                 <ShoppingBag />
               </IconButton>
             </Grid>
+
+            {/* Хэрэглэгч */}
             <Grid item xs={1} sx={{ textAlign: "right" }}>
               <IconButton
                 sx={{
@@ -131,14 +140,16 @@ const Header = () => {
         </Toolbar>
       </AppBar>
 
+      {/* Навигацийн таб */}
       <Box sx={{ width: "100%", bgcolor: "background.paper" }}>
         <Tabs
-          value={value}
-          onChange={handleChange}
+          value={value} // Хэвийн анхны таб нь "Ном"
+          onChange={handleChange} // Табиудын дунд шилжих функц
           centered
           aria-label="Navigation Tabs"
-          TabIndicatorProps={{ style: { backgroundColor: "#000" } }}
+          TabIndicatorProps={{ style: { backgroundColor: "#000" } }} // Далд индикаторын өнгө
         >
+          {/* Нүүр таб */}
           <Tab
             component={Link}
             to="/"
@@ -149,10 +160,12 @@ const Header = () => {
               textTransform: "none",
               flex: 1,
               textAlign: "center",
-              fontWeight: value === "1" ? "bold" : "normal", // Bold text for active tab
-              transition: "color 0.3s, font-weight 0.3s", // Smooth transition
+              fontWeight: value === "1" ? "bold" : "normal", // Идэвхтэй таб-ийг бүдүүн болгож харагдуулах
+              transition: "color 0.3s, font-weight 0.3s", // Өнгө, үсгийн зузаан тайван өөрчлөгдөх
             }}
           />
+
+          {/* Ном таб */}
           <Tab
             component={Link}
             to="/books"
@@ -163,10 +176,12 @@ const Header = () => {
               textTransform: "none",
               flex: 1,
               textAlign: "center",
-              fontWeight: value === "2" ? "bold" : "normal", // Bold text for active tab
-              transition: "color 0.3s, font-weight 0.3s", // Smooth transition
+              fontWeight: value === "2" ? "bold" : "normal", // Идэвхтэй таб-ийг бүдүүн болгож харагдуулах
+              transition: "color 0.3s, font-weight 0.3s", // Өнгө, үсгийн зузаан тайван өөрчлөгдөх
             }}
           />
+
+          {/* Шилдэг таб */}
           <Tab
             component={Link}
             to="/top"
@@ -177,8 +192,8 @@ const Header = () => {
               textTransform: "none",
               flex: 1,
               textAlign: "center",
-              fontWeight: value === "3" ? "bold" : "normal", // Bold text for active tab
-              transition: "color 0.3s, font-weight 0.3s", // Smooth transition
+              fontWeight: value === "3" ? "bold" : "normal", // Идэвхтэй таб-ийг бүдүүн болгож харагдуулах
+              transition: "color 0.3s, font-weight 0.3s", // Өнгө, үсгийн зузаан тайван өөрчлөгдөх
             }}
           />
         </Tabs>
