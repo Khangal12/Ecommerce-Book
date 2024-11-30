@@ -7,6 +7,7 @@ from backend.models import db, Book
 from backend.routes.admin import admin_bp
 from backend.routes.login import login_bp
 from backend.routes.filter import filter_bp
+from backend.routes.detail import detail_bp
 from dotenv import load_dotenv
 from flask_cors import CORS
 
@@ -26,7 +27,7 @@ def create_app(config_name="development"):
     CORS(admin_bp, origins=["http://localhost:3000","http://localhost:3001"])
     CORS(login_bp,origins=["http://localhost:3000","http://localhost:3001"])
     CORS(filter_bp,origins=["http://localhost:3000","http://localhost:3001"])
-
+    CORS(detail_bp, origins=["http://localhost:3000","http://localhost:3001"])
     # Load configuration
     app.config.from_object(config[config_name])
 
@@ -38,6 +39,7 @@ def create_app(config_name="development"):
     app.register_blueprint(admin_bp)
     app.register_blueprint(login_bp)
     app.register_blueprint(filter_bp)
+    app.register_blueprint(detail_bp)
 
     return app
 

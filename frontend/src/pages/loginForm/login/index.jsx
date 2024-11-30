@@ -5,6 +5,8 @@ import FacebookIcon from '@mui/icons-material/Facebook';
 import GoogleIcon from '@mui/icons-material/Google';
 import { useNavigate } from 'react-router-dom';
 import useApi from '../../../useApi';
+import { useUser } from '../../../context/UserContext';
+
 const Login = () => {
     const loginPhoto = '/assets/login.png'
     const [email, setUsername] = useState('');
@@ -12,6 +14,7 @@ const Login = () => {
     const [rememberMe, setRememberMe] = useState(true);
     const {apiCallWithToast , loading} = useApi()
     const navigate = useNavigate(); 
+    const { login } = useUser();
 
     
 
@@ -40,7 +43,13 @@ const Login = () => {
                 method: 'POST',
                 data: formData, // Send the FormData object as the body
             });
-    
+            const { status, message, user } = await response;
+
+            if(status === 'success'){
+                login(user);
+                navigate(-1);
+            }
+
         } catch (error) {
             console.error('Error:', error);
             // Handle network error

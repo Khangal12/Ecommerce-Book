@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   AppBar,
   Toolbar,
@@ -8,17 +8,40 @@ import {
   Box,
   Grid,
   Tabs,
+  Menu,
+  MenuItem,
 } from "@mui/material";
-import { Search, Menu, Book, ShoppingBag, Person } from "@mui/icons-material";
+import { Search, Menu as MenuIcon, Book, ShoppingBag, Person } from "@mui/icons-material";
 import Tab from "@mui/material/Tab";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { useUser } from "../../context/UserContext";
+import { toast } from "react-toastify"; // Import toast
 
 const Header = () => {
   const [value, setValue] = React.useState("1");
+  const [anchorEl, setAnchorEl] = useState(null); // For the dropdown menu
+  const navigate = useNavigate();
+  const { user , logout} = useUser(); // Assuming user context provides user info
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
+  };
+
+  const handleMenuClick = (event) => {
+    setAnchorEl(event.currentTarget); // Open the menu on icon click
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null); // Close the menu
+  };
+
+  const handleLogout = () => {
+    // Add your logout logic here
+    logout()
+    toast.success("Successfully logged out!"); 
+    handleMenuClose();
   };
 
   return (
@@ -54,7 +77,7 @@ const Header = () => {
                     color: "#000",
                   }}
                 >
-                  <Menu />
+                  <MenuIcon />
                 </IconButton>
                 <InputBase
                   placeholder="Хайх үг оруулна уу"
@@ -83,9 +106,26 @@ const Header = () => {
                   color: "#000",
                   borderRadius: "50%",
                 }}
+                onClick={handleMenuClick} // Open dropdown menu on click
               >
                 <Person />
               </IconButton>
+
+              {/* Dropdown Menu */}
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)} // Menu is open if there's an anchor element
+                onClose={handleMenuClose}
+              >
+                {user ? (
+                  <>
+                    <MenuItem onClick={() => navigate("/settings")}>Тохиргоо</MenuItem>
+                    <MenuItem onClick={handleLogout}>Гарах</MenuItem>
+                  </>
+                ) : (
+                  <MenuItem onClick={() => navigate("/login")}>Нэвтрэх</MenuItem>
+                )}
+              </Menu>
             </Grid>
           </Grid>
         </Toolbar>
