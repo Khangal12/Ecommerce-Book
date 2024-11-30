@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Card, CardContent, CardMedia, Typography, Grid } from '@mui/material';
-import Header from '../../header/header';
+import Header from '../../components/header';
 import axios from 'axios';
 import useApi from '../../useApi';
 const HomePage = () => {
