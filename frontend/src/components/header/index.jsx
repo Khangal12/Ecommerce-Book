@@ -14,18 +14,28 @@ import {
 import { Search, Menu as MenuIcon, Book, ShoppingBag, Person } from "@mui/icons-material";
 import Tab from "@mui/material/Tab";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
 import { toast } from "react-toastify"; // Import toast
 
 const Header = () => {
-  // "Ном" хуудас нь эхний хуудас байх ёстой гэдэг утга.
-  const [value, setValue] = React.useState("2");
+  const location = useLocation();
   const [anchorEl, setAnchorEl] = useState(null); // For the dropdown menu
   const navigate = useNavigate();
   const { user , logout} = useUser(); // Assuming user context provides user info
 
+  const getTabValue = () => {
+    switch (location.pathname) {
+      case "/books":
+        return "2";
+      case "/top":
+        return "3";
+      default:
+        return "1"; // Default to home page
+    }
+  };
+  const [value, setValue] = useState(getTabValue);
   // Tab сонголт өөрчлөгдөх үед утга шинэчлэх функц
   const handleChange = (event, newValue) => {
     setValue(newValue);

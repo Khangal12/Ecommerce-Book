@@ -8,7 +8,7 @@ book_bp = Blueprint('book', __name__)
 def get_books():
     with current_app.app_context():
         try:
-            
+            books = Book.query.limit(10)
 
             books_data = [book.to_dict() for book in books]
 
