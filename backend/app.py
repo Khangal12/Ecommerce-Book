@@ -6,6 +6,7 @@ from backend.config import config
 from backend.models import db, Book
 from backend.routes.admin import admin_bp
 from backend.routes.login import login_bp
+from backend.routes.book import book_bp
 from dotenv import load_dotenv
 from flask_cors import CORS
 
@@ -24,6 +25,7 @@ def create_app(config_name="development"):
     CORS(app, origins=["http://localhost:3000"])
     CORS(admin_bp, origins=["http://localhost:3000"])
     CORS(login_bp,origins=["http://localhost:3000"])
+    CORS(book_bp,origins=["https://localhost:3000"])
 
     # Load configuration
     app.config.from_object(config[config_name])
@@ -35,6 +37,7 @@ def create_app(config_name="development"):
     # Register blueprints
     app.register_blueprint(admin_bp)
     app.register_blueprint(login_bp)
+    app.register_blueprint(book_bp)
 
     return app
 
