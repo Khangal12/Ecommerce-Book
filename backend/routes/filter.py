@@ -112,3 +112,36 @@ def get_one_book(id):
                 "message": "An error occurred while fetching the book",
                 "error": str(e)
             }), 500
+
+@filter_bp.route('/recommendations/<int:id>/', methods=['GET'])
+def get_recommendations(id):
+    with current_app.app_context():
+        try:
+            book = Book.query.get(id)
+            
+            if not book:
+                return jsonify({
+                    "status": "error",
+                    "message": f"Book with ID {id} not found."
+                }), 404
+            
+            recommendations = Book.query.filter(
+                Book.categories.any(Category.id.in_([cat.id for cat in book.categories])),  # Check for matching categories
+                Book.id != id  # Exclude the current book
+            ).limit(5).all()
+
+            recommendation_data = [rec.to_dict() for rec in recommendations]
+        
+            return jsonify({
+                "status": "success",
+                "book": recommendation_data
+            }), 200
+
+        except Exception as e:
+            current_app.logger.error(f"Error while fetching book with ID {id}: {traceback.format_exc()}")
+            return jsonify({
+                "status": "error",
+                "message": "An error occurred while fetching the book",
+                "error": str(e)
+            }), 500
+

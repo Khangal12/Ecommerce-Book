@@ -18,8 +18,8 @@ const useApi = () => {
       } else {
         toast.error(errorMessage); // Error toast
       }
+      return response.data; 
 
-      return response.data; // Return only the response data
     } catch (error) {
       // Handle errors, show error toast with specific message
       const errorMsg =

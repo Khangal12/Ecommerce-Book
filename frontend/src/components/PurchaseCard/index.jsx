@@ -9,7 +9,7 @@ import {
   InputLabel,
 } from "@mui/material";
 
-const PurchaseCard = ({ stock, price }) => {
+const PurchaseCard = ({ stock, price, bookId }) => {
   const [quantity, setQuantity] = useState(1);
 
   const handleQuantityChange = (event) => {

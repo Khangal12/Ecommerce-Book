@@ -10,7 +10,6 @@ def login():
     with current_app.app_context():
         try:
             data = request.form
-            print(data)
             email = data.get('email')
             password = data.get('password')
 
@@ -18,8 +17,15 @@ def login():
             user = User.query.filter_by(email=email).first()
 
             if user and check_password_hash(user.password, password):
+                user_data = {
+                    "id": user.id,
+                    "email": user.email,
+                    "username": user.username,
+                    "address": user.address,
+                    "phone_number": user.phone_number
+                }
                 # Password is correct, return success
-                return jsonify({"status": "success", "message": "Login successful"}), 200
+                return jsonify({"status": "success", "message": "Login successful", "user":user_data}), 200
             else:
                 # Invalid email or password
                 return jsonify({"status": "error", "message": "Invalid credentials"}), 401
