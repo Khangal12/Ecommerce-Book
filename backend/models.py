@@ -26,6 +26,7 @@ class Order(db.Model):
     order_date = db.Column(db.DateTime, default=datetime.utcnow)
     status = db.Column(db.String)
     total_price = db.Column(db.Numeric)
+    address = db.Column(db.String)
 
     user = db.relationship('User', backref=db.backref('orders', lazy=True))
 

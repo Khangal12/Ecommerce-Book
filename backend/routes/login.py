@@ -25,10 +25,10 @@ def login():
                     "phone_number": user.phone_number
                 }
                 # Password is correct, return success
-                return jsonify({"status": "success", "message": "Login successful", "user":user_data}), 200
+                return jsonify({"status": "success", "message": "Амжилттай нэвтэрлээ", "user":user_data}), 200
             else:
                 # Invalid email or password
-                return jsonify({"status": "error", "message": "Invalid credentials"}), 401
+                return jsonify({"status": "error", "message": "Алдаа"}), 401
 
         except Exception as e:
             current_app.logger.error(f"Error during login: {traceback.format_exc()}")
