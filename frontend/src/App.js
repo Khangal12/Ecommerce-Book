@@ -10,6 +10,7 @@ import ResetPassword from './pages/loginForm/resetPassword/resetPassword';
 import HomePage from './pages/home/home';
 import Filter from './pages/Filter';
 import Detail from './pages/Detail';
+import UserSettings from './components/userSettings/settings';
 
 // Import AppLayout
 import AppLayout from './components/Layout';
@@ -26,12 +27,14 @@ function App() {
             <Route path="/" element={<AppLayout />}>
               <Route index element={<HomePage />} />
               <Route path="/books" element={<Filter />} />
+              <Route path="/settings" element={<UserSettings />} />
               <Route path="/books/:id" element={<Detail />} />
               <Route path="/top" element={<Filter />} />
             </Route>
             <Route path="/signUp" element={<SignUp />} />
             <Route path="/resetPassword" element={<ResetPassword />} />
             <Route path="/login" element={<Login />} />
+
           </Routes>
 
           {/* Toast notifications */}
