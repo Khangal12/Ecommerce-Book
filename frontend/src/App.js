@@ -12,6 +12,8 @@ import Filter from "./pages/Filter";
 import Detail from "./pages/Detail";
 import Cart from "./pages/Cart"
 import CheckoutPage from "./pages/Order";
+import UserSettings from './components/userSettings/settings';
+
 // Import AppLayout
 import AppLayout from "./components/Layout";
 
@@ -27,6 +29,7 @@ function App() {
               <Route path="/" element={<AppLayout />}>
                 <Route index element={<HomePage />} />
                 <Route path="/books" element={<Filter />} />
+              <Route path="/settings" element={<UserSettings />} />
                 <Route path="/books/:id" element={<Detail />} />
                 <Route path="/top" element={<Filter />} />
                 <Route path="/cart" element={<Cart />} />
@@ -35,6 +38,7 @@ function App() {
               <Route path="/signUp" element={<SignUp />} />
               <Route path="/resetPassword" element={<ResetPassword />} />
               <Route path="/login" element={<Login />} />
+
             </Routes>
 
             {/* Toast notifications */}

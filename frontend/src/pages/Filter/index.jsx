@@ -96,7 +96,14 @@ const ECommercePage = () => {
                   <Grid item xs={12} sm={6} md={4} key={product.id}>
                     <Card
                       onClick={() => handleCardClick(product)}
-                      sx={{ cursor: "pointer" }}
+                      sx={{
+                        cursor: "pointer",
+                        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                        '&:hover': {
+                          transform: 'scale(1.05)',
+                          boxShadow: '0px 4px 20px rgb(102, 179, 255)',
+                        },
+                      }}
                     >
                       <CardMedia
                         component="img"
