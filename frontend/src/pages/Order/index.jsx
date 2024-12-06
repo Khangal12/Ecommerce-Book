@@ -121,7 +121,7 @@ const CheckoutPage = () => {
 
     // Proceed to the next step if everything is valid
     if (activeStep === steps.length - 1) {
-		fetchCartCount();
+		fetchCartCount();hanga
       handleOrderSubmit(); // Final submission
     } else {
       setActiveStep((prevActiveStep) => prevActiveStep + 1);
