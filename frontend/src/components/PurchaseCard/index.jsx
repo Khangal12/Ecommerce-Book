@@ -8,12 +8,22 @@ import {
   FormControl,
   InputLabel,
 } from "@mui/material";
+import { useCart } from "../../context/CartContext";
 
 const PurchaseCard = ({ stock, price, bookId }) => {
+  const {addToCart} = useCart();
   const [quantity, setQuantity] = useState(1);
 
   const handleQuantityChange = (event) => {
     setQuantity(event.target.value);
+  };
+
+  const handleAddToCart = () => {
+    if (quantity <= stock) {
+      addToCart(bookId, quantity);
+    } else {
+      alert("Үлдэгдэл хүрэлцэхгүй байна!");
+    }
   };
 
   return (
@@ -89,6 +99,7 @@ const PurchaseCard = ({ stock, price, bookId }) => {
           fontSize: "16px", 
           "&:hover": { backgroundColor: "#4a2e75" },
         }}
+        onClick={handleAddToCart}
       >
         ❤️ Сагсанд нэмэх
       </Button>

@@ -11,19 +11,27 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
-import { Search, Menu as MenuIcon, Book, ShoppingBag, Person } from "@mui/icons-material";
+import {
+  Search,
+  Menu as MenuIcon,
+  Book,
+  ShoppingBag,
+  Person,
+} from "@mui/icons-material";
 import Tab from "@mui/material/Tab";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { useNavigate,useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
+import { useCart } from "../../context/CartContext";
 import { toast } from "react-toastify"; // Import toast
 
 const Header = () => {
   const location = useLocation();
   const [anchorEl, setAnchorEl] = useState(null); // For the dropdown menu
   const navigate = useNavigate();
-  const { user , logout} = useUser(); // Assuming user context provides user info
+
+  const { user, logout } = useUser();
+  const { cartItems } = useCart();
 
   const getTabValue = () => {
     switch (location.pathname) {
@@ -51,8 +59,8 @@ const Header = () => {
 
   const handleLogout = () => {
     // Add your logout logic here
-    logout()
-    toast.success("Successfully logged out!"); 
+    logout();
+    toast.success("Successfully logged out!");
     handleMenuClose();
   };
 
@@ -108,12 +116,39 @@ const Header = () => {
             <Grid item xs={1}>
               <IconButton
                 sx={{
-                  paddingX: 5,
+                  ml: 8,
                   fontSize: "2.5rem",
                   color: "#000",
                 }}
+                onClick={() => {
+                  if (user) {
+                    navigate("/cart");
+                  } else {
+                    toast.error("Нэвтэрэх шаардлагатай");
+                  }
+                }}
               >
                 <ShoppingBag />
+                {cartItems > 0 && (
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      top: 0,
+                      right: 0,
+                      bgcolor: "red",
+                      color: "white",
+                      borderRadius: "50%",
+                      width: "15px",
+                      height: "15px",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      fontSize: "12px",
+                    }}
+                  >
+                    {cartItems}
+                  </Box>
+                )}
               </IconButton>
             </Grid>
 
@@ -138,11 +173,15 @@ const Header = () => {
               >
                 {user ? (
                   <>
-                    <MenuItem onClick={() => navigate("/settings")}>Тохиргоо</MenuItem>
+                    <MenuItem onClick={() => navigate("/settings")}>
+                      Тохиргоо
+                    </MenuItem>
                     <MenuItem onClick={handleLogout}>Гарах</MenuItem>
                   </>
                 ) : (
-                  <MenuItem onClick={() => navigate("/login")}>Нэвтрэх</MenuItem>
+                  <MenuItem onClick={() => navigate("/login")}>
+                    Нэвтрэх
+                  </MenuItem>
                 )}
               </Menu>
             </Grid>
