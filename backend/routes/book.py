@@ -17,4 +17,15 @@ def get_books():
         except Exception as e:
             current_app.logger.error(f"Error retrieving books: {traceback.format_exc()}")
             return jsonify({"status": "error", "message": "Error saving the book", "error": str(e)}), 500
+
+@book_bp.route('/search/', methods=["GET"])
+def search_books():
+    query = request.args.get('q', '').lower()  # Get search query from URL parameter
+    if not query:
+        return jsonify([]) 
+    
+    results = Book.query.filter(Book.title.ilike(f'%{query}%')).all()
+
+    return jsonify([book.to_dict() for book in results])
+
         

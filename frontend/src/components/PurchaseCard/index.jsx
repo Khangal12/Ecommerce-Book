@@ -9,9 +9,14 @@ import {
   InputLabel,
 } from "@mui/material";
 import { useCart } from "../../context/CartContext";
+import { useUser } from "../../context/UserContext";
+import { useNavigate } from "react-router-dom";
 
 const PurchaseCard = ({ stock, price, bookId }) => {
-  const {addToCart} = useCart();
+  const { user } = useUser();
+  const { addToCart } = useCart();
+  const navigate = useNavigate();
+
   const [quantity, setQuantity] = useState(1);
 
   const handleQuantityChange = (event) => {
@@ -21,6 +26,15 @@ const PurchaseCard = ({ stock, price, bookId }) => {
   const handleAddToCart = () => {
     if (quantity <= stock) {
       addToCart(bookId, quantity);
+    } else {
+      alert("Үлдэгдэл хүрэлцэхгүй байна!");
+    }
+  };
+
+  const handleAddOrder = async () => {
+    if (quantity <= stock) {
+      await addToCart(bookId, quantity);
+      navigate(`/cart`);
     } else {
       alert("Үлдэгдэл хүрэлцэхгүй байна!");
     }
@@ -44,8 +58,8 @@ const PurchaseCard = ({ stock, price, bookId }) => {
           justifyContent: "space-between",
           alignItems: "center",
           marginBottom: 3,
-          marginTop:3,
-          maxHeight:400
+          marginTop: 3,
+          maxHeight: 400,
         }}
       >
         <Typography variant="subtitle1">Онлайн үнэ:</Typography>
@@ -73,7 +87,7 @@ const PurchaseCard = ({ stock, price, bookId }) => {
       <FormControl fullWidth sx={{ marginTop: 2 }}>
         <InputLabel id="quantity-label">Авах</InputLabel>
         <Select
-        size="small"
+          size="small"
           labelId="quantity-label"
           value={quantity}
           onChange={handleQuantityChange}
@@ -96,10 +110,11 @@ const PurchaseCard = ({ stock, price, bookId }) => {
           marginTop: 5,
           borderRadius: "50px",
           padding: "12px 16px", // Custom size
-          fontSize: "16px", 
+          fontSize: "16px",
           "&:hover": { backgroundColor: "#4a2e75" },
         }}
         onClick={handleAddToCart}
+        disabled={!user}
       >
         ❤️ Сагсанд нэмэх
       </Button>
@@ -114,9 +129,11 @@ const PurchaseCard = ({ stock, price, bookId }) => {
           color: "#333",
           borderRadius: "50px",
           padding: "12px 16px", // Custom size
-          fontSize: "16px", 
+          fontSize: "16px",
           "&:hover": { backgroundColor: "#f9f9f9" },
         }}
+        onClick={handleAddOrder}
+        disabled={!user}
       >
         ☆ Худалдан авах
       </Button>
