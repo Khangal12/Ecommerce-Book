@@ -31,9 +31,9 @@ def create_app(config_name="development"):
     CORS(login_bp,origins=["http://localhost:3000","http://localhost:3001"])
     CORS(filter_bp,origins=["http://localhost:3000","http://localhost:3001"])
     CORS(detail_bp, origins=["http://localhost:3000","http://localhost:3001"])    
-    CORS(book_bp,origins=["https://localhost:3000"])
-    CORS(user_settings_bp,origins=["https://localhost:3000"])    
-    CORS(cart_bp,origins=["https://localhost:3000"])
+    CORS(book_bp,origins=["https://localhost:3000","http://localhost:3001"])
+    CORS(user_settings_bp,origins=["https://localhost:3000","http://localhost:3001"])    
+    CORS(cart_bp,origins=["https://localhost:3000","http://localhost:3001"])
 
     # Load configuration
     app.config.from_object(config[config_name])

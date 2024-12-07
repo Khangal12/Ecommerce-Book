@@ -16,13 +16,14 @@ import {
   Alert,
   Divider,
 } from "@mui/material";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useUser } from "../../context/UserContext";
 import { useCart } from "../../context/CartContext";
 
 const CheckoutPage = () => {
   const steps = ["Хүргэх хаяг", "Төлбөр", "Баталгаажуулалт"];
+  const navigate = useNavigate();
 
   const [activeStep, setActiveStep] = useState(0);
   const [selectedPayment, setSelectedPayment] = useState([]);
@@ -39,7 +40,7 @@ const CheckoutPage = () => {
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
   const { user } = useUser();
-  const { fetchCartCount } = useCart();
+  const { fetchCartCount } = useCart(); // Now fetchCartCount is available
 
   const paymentMethods = [
     {
@@ -73,7 +74,7 @@ const CheckoutPage = () => {
     0
   );
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (activeStep === 0) {
       // Step 1: Validate address form fields
       const { name, phone, city, district, subDistrict, detailedAddress } =
@@ -121,8 +122,7 @@ const CheckoutPage = () => {
 
     // Proceed to the next step if everything is valid
     if (activeStep === steps.length - 1) {
-      fetchCartCount();
-      handleOrderSubmit(); // Final submission
+      navigate("/cart");
     } else {
       setActiveStep((prevActiveStep) => prevActiveStep + 1);
     }
@@ -166,7 +166,8 @@ const CheckoutPage = () => {
         setSnackbarSeverity("success");
         setOpenSnackbar(true);
         // fetchCartCount();
-        setActiveStep(steps.length - 1); // Move to the confirmation step
+        setActiveStep(steps.length - 1);
+        fetchCartCount();
       } else {
         setSnackbarMessage(
           "Захиалга илгээхэд алдаа гарлаа. Дахин оролдоно уу."
