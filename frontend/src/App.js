@@ -16,7 +16,7 @@ import UserSettings from "./components/userSettings/settings";
 import AppLayout from "./components/Layout";
 import OrdersPage from "./pages/OrderDetail";
 
-import { UserProvider, useUser } from "./context/UserContext";
+import { UserProvider} from "./context/UserContext";
 import { CartProvider } from "./context/CartContext";
 
 function App() {

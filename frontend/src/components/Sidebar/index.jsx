@@ -1,96 +1,102 @@
 import React, { useState, useEffect } from "react";
 import { Box, Typography, Slider, Chip, Divider, CircularProgress } from "@mui/material";
-import axios from "axios"; // Import axios
+import axios from "axios"; // axios-г импортлоод API хүсэлт хийхэд ашиглана.
 
 const FilterSidebar = ({ filters, onFilterChange }) => {
-  const [priceRange, setPriceRange] = useState([5000, 500000]);
-  const [rating, setRating] = useState(0);
-  const [selectedCategories, setSelectedCategories] = useState([]);
-  const [selectedAuthors, setSelectedAuthors] = useState([]);
-  const [categories, setCategories] = useState([]); // State to store categories
-  const [authors, setAuthors] = useState([]); // You can modify this to fetch authors from API as well if needed
-  const [loading, setLoading] = useState(true);  // Loading state for API request
+  const [priceRange, setPriceRange] = useState([5000, 500000]); // Үнэ хязгаарын тохиргоо, анх 5000-500000₮
+  const [rating, setRating] = useState(0); // Үнэлгээний тохиргоо
+  const [selectedCategories, setSelectedCategories] = useState([]); // Сонгосон төрлүүдийн жагсаалт
+  const [selectedAuthors, setSelectedAuthors] = useState([]); // Сонгосон зохиолчдын жагсаалт
+  const [categories, setCategories] = useState([]); // Категориудыг хадгалах хувьсагч
+  const [authors, setAuthors] = useState([]); // Зохиолчдыг хадгалах хувьсагч
+  const [loading, setLoading] = useState(true);  // API хүсэлт хийх үед лоадингийн төлөв
 
-  // Fetch categories from the backend API
+  // API-с категория болон зохиолчдыг татах функц
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const response = await axios.get("http://127.0.0.1:5000/categories/"); 
-        setCategories(response.data?.categories); 
-        setAuthors(response.data?.authors);
-        setLoading(false);  // Set loading to false once the data is fetched
+        setCategories(response.data?.categories); // Категориудыг тохирох хувьсагчид хадгална.
+        setAuthors(response.data?.authors); // Зохиолчдыг тохирох хувьсагчид хадгална.
+        setLoading(false);  // Өгөгдлийг амжилттай татсан тул лоадингийг дуусгав.
       } catch (error) {
-        console.error("Error fetching categories:", error);
-        setLoading(false);  // Set loading to false even if there's an error
+        console.error("Error fetching categories:", error); // Алдааг дэлгэцэнд хэвлэх
+        setLoading(false);  // Алдаа гарсан ч лоадингийг дуусгав.
       }
     };
 
-    fetchCategories();
+    fetchCategories(); // Категори болон зохиолчдын өгөгдлийг татах
   }, []);
 
+  // Үнэ хязгаарыг өөрчлөх функц
   const handlePriceChange = (event, newValue) => {
-    setPriceRange(newValue);
-    onFilterChange({ ...filters, priceRange: newValue });
+    setPriceRange(newValue); // Үнэ хязгаарыг шинэчилнэ
+    onFilterChange({ ...filters, priceRange: newValue }); // Фильтрийн сонголтыг өөрчлөн дамжуулна.
   };
 
+  // Категори сонгох/солоох функц
   const handleCategoryToggle = (category) => {
     const updatedCategories = selectedCategories.includes(category)
-      ? selectedCategories.filter((item) => item !== category)
-      : [...selectedCategories, category];
+      ? selectedCategories.filter((item) => item !== category) // Хэрэв сонгогдсон бол хасна
+      : [...selectedCategories, category]; // Сонгоогүй бол нэмнэ
 
-    setSelectedCategories(updatedCategories);
-    onFilterChange({ ...filters, category: updatedCategories.map((item) => item.id) });
+    setSelectedCategories(updatedCategories); // Сонгосон категориудыг шинэчилнэ
+    onFilterChange({ ...filters, category: updatedCategories.map((item) => item.id) }); // Фильтрэд шинэ тохиргоог дамжуулна
   };
 
+  // Зохиолч сонгох/солоох функц
   const handleAuthorToggle = (author) => {
     const updatedAuthors = selectedAuthors.includes(author)
-      ? selectedAuthors.filter((item) => item !== author)
-      : [...selectedAuthors, author];
+      ? selectedAuthors.filter((item) => item !== author) // Хэрэв сонгогдсон бол хасна
+      : [...selectedAuthors, author]; // Сонгоогүй бол нэмнэ
 
-    setSelectedAuthors(updatedAuthors);
-    onFilterChange({ ...filters, author: updatedAuthors });
+    setSelectedAuthors(updatedAuthors); // Сонгосон зохиолчдыг шинэчилнэ
+    onFilterChange({ ...filters, author: updatedAuthors }); // Фильтрэд шинэ тохиргоог дамжуулна
   };
 
   return (
     <Box sx={{ width: 250, padding: 2, borderRight: "1px solid #ddd" }}>
-      {/* Show a loading spinner if the data is still loading */}
+      {/* Өгөгдлийг татаж байх үед лоадинг spinner-г харуулах */}
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-          <CircularProgress />
+          <CircularProgress /> {/* Лоадингийн эргэлт */}
         </Box>
       ) : (
         <>
-          {/* Filter summary */}
+          {/* Сонгосон фильтруудын дэлгэц */}
           <Box sx={{ marginBottom: 2 }}>
             <Typography variant="subtitle1">Сонгосон</Typography>
+            {/* Сонгосон категориудыг харуулах */}
             {selectedCategories.length > 0 && (
               <Box display="flex" flexWrap="wrap" gap={1}>
                 {selectedCategories.map((category) => (
                   <Chip
                     key={category.id}
                     label={category.name}
-                    onDelete={() => handleCategoryToggle(category)}
+                    onDelete={() => handleCategoryToggle(category)} // Устгах товч
                     color="primary"
                   />
                 ))}
               </Box>
             )}
+            {/* Сонгосон зохиолчдыг харуулах */}
             {selectedAuthors.length > 0 && (
               <Box display="flex" flexWrap="wrap" gap={1} sx={{ marginTop: 1 }}>
                 {selectedAuthors.map((author) => (
                   <Chip
                     key={author}
                     label={author}
-                    onDelete={() => handleAuthorToggle(author)}
+                    onDelete={() => handleAuthorToggle(author)} // Устгах товч
                     color="primary"
                   />
                 ))}
               </Box>
             )}
+            {/* Үнэлгээ сонгосон бол харуулах */}
             {rating > 0 && (
               <Chip
                 label={`${rating} Star${rating > 1 ? "s" : ""}`}
-                onDelete={() => setRating(0)}
+                onDelete={() => setRating(0)} // Үнэлгээг устгах
                 color="primary"
                 sx={{ marginTop: 1 }}
               />
@@ -99,7 +105,7 @@ const FilterSidebar = ({ filters, onFilterChange }) => {
 
           <Divider sx={{ marginBottom: 2 }} />
 
-          {/* Category Filter */}
+          {/* Категори сонгох хэсэг */}
           <Typography variant="subtitle1" sx={{ marginBottom: 1 }}>
             Төрөл
           </Typography>
@@ -108,7 +114,7 @@ const FilterSidebar = ({ filters, onFilterChange }) => {
               <Chip
                 key={category.id}
                 label={category.name}
-                onClick={() => handleCategoryToggle(category)}
+                onClick={() => handleCategoryToggle(category)} // Категорийг сонгох
                 color={selectedCategories.includes(category.id) ? "primary" : "default"}
                 variant={selectedCategories.includes(category.id) ? "filled" : "outlined"}
               />
@@ -117,7 +123,7 @@ const FilterSidebar = ({ filters, onFilterChange }) => {
 
           <Divider sx={{ margin: "16px 0" }} />
 
-          {/* Author Filter */}
+          {/* Зохиолч сонгох хэсэг */}
           <Typography variant="subtitle1" sx={{ marginBottom: 1 }}>
             Зохиолч
           </Typography>
@@ -126,7 +132,7 @@ const FilterSidebar = ({ filters, onFilterChange }) => {
               <Chip
                 key={author}
                 label={author}
-                onClick={() => handleAuthorToggle(author)}
+                onClick={() => handleAuthorToggle(author)} // Зохиолчийг сонгох
                 color={selectedAuthors.includes(author) ? "primary" : "default"}
                 variant={selectedAuthors.includes(author) ? "filled" : "outlined"}
               />
@@ -135,17 +141,17 @@ const FilterSidebar = ({ filters, onFilterChange }) => {
 
           <Divider sx={{ margin: "16px 0" }} />
 
-          {/* Price Range Slider */}
+          {/* Үнэ тохируулах хэсэг */}
           <Typography variant="subtitle1" sx={{ marginBottom: 1 }}>
             Үнэ
           </Typography>
           <Slider
             value={priceRange}
-            onChange={handlePriceChange}
+            onChange={handlePriceChange} // Үнэ сонголтыг шинэчлэх
             valueLabelDisplay="auto"
-            valueLabelFormatter={(value) => `₮${value}`}
-            min={5000}
-            max={500000}
+            valueLabelFormatter={(value) => `₮${value}`} // Үнэ харуулах формат
+            min={5000} // Минимум үнэ
+            max={500000} // Хамгийн их үнэ
             sx={{ marginBottom: 2 }}
           />
           <Box display="flex" justifyContent="space-between">

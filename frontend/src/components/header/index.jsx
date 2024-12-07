@@ -346,7 +346,7 @@ const Header = () => {
             component={Link}
             to="/orders"
             icon={<Person />}
-            label="Шилдэг"
+            label="Захиалга"
             value="3"
             sx={{
               textTransform: "none",

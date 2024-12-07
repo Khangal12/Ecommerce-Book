@@ -1,118 +1,127 @@
-import React, { useState } from "react";
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  TextField,
-  Rating,
-  Box,
+import React, { useState } from "react"; 
+import { 
+  Button, 
+  Dialog, 
+  DialogActions, 
+  DialogContent, 
+  DialogTitle, 
+  TextField, 
+  Rating, 
+  Box 
 } from "@mui/material";
 
-const CommentModal = ({ open, handleModal, bookId,refresh, user }) => {
-  const [comment, setComment] = useState("");
-  const [rating, setRating] = useState(0); // State to track the rating
-  const [loading, setLoading] = useState(false); // State to track the loading state
-  const [error, setError] = useState(""); // State to track any error during submission
+// Энэ модал нь номын сэтгэгдэл болон үнэлгээ бичих боломжийг хэрэглэгчдэд олгодог.
+const CommentModal = ({ open, handleModal, bookId, refresh, user }) => {
 
-  // Function to save the comment and rating
+  const [comment, setComment] = useState(""); // Сэтгэгдлийг хадгалах
+  const [rating, setRating] = useState(0); // Үнэлгээг хадгалах
+  const [loading, setLoading] = useState(false); // Уншиж буй мэдээллийг харуулах
+  const [error, setError] = useState(""); // Алдааг хадгалах
+
+  // Сэтгэгдлийг хадгалах функц
   const handleSave = async () => {
     if (rating === 0) {
-      setError("Please select a rating before submitting.");
-      return;
+      setError("Үнэлгээ өгнө үү!"); // Үнэлгээ сонгоогүй бол анхааруулга
+      return; // Хэрэв үнэлгээ 0 байвал хадгалалтыг үргэлжлүүлэхгүй
     }
-    setLoading(true);
-    setError(""); // Reset error message
+    setLoading(true); // Татаж авах үед байршлыг идэвхжүүлнэ
+    setError(""); // Алдааг цэвэрлэнэ
 
     try {
-      // Send the comment and rating to the backend
+      // Сэтгэгдэл, үнэлгээ болон номын ID-г сервер рүү илгээх
       const response = await fetch("http://127.0.0.1:5000/review", {
-        method: "POST",
+        method: "POST", // HTTP POST хүсэлт
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json", // JSON форматын хүсэлт
         },
+        // ирж буй датаг хадгалах
         body: JSON.stringify({
-          book_id: bookId,
-          rating: rating,
-          comment: comment,
-          user_id: user.id
+          book_id: bookId, // Номын ID
+          rating: rating, // Үнэлгээ
+          comment: comment, // Сэтгэгдэл
+          user_id: user.id, // Хэрэглэгчийн ID
         }),
       });
 
-      const data = await response.json();
+      const data = await response.json(); // Серверээс ирсэн хариуг авна
 
+      // Хэрэв серверээс хариу амжилттай ирсэн бол
       if (response.ok) {
-        refresh();
-        handleModal(); // Close the modal after saving
+        refresh(); // Номын сэтгэгдлийг дахин ачаална
+        handleModal(); // Модалыг хаана
       } else {
-        setError(data.error || "Failed to save comment");
+        // Амжилтгүй бол алдааг харуулна
+        setError(data.error || "Сэтгэгдэл хадгалахад алдаа гарлаа");
       }
     } catch (error) {
-      setError("An error occurred while saving the comment.");
+      // Хэрэв сервер рүү хүсэлт хийхэд алдаа гарвал
+      setError("Сэтгэгдэл хадгалахад алдаа гарлаа.");
     } finally {
-      setLoading(false); // Set loading to false once the request is finished
+      // Хүсэлт дууссаны дараа байршлыг унтраана
+      setLoading(false);
     }
   };
 
   return (
     <Dialog open={open} onClose={handleModal} maxWidth="md" fullWidth>
-      <DialogTitle>Сэтгэгдэл бичих</DialogTitle>
+      <DialogTitle>Сэтгэгдэл бичих</DialogTitle> 
       <DialogContent>
-        {/* Display error if there is one */}
+        {/* Хэрэв алдаа гарвал, алдааг дэлгэцэнд харуулах */}
         {error && <Box sx={{ color: "red", marginBottom: 2 }}>{error}</Box>}
 
-        {/* Star Rating */}
+        {/* Үнэлгээний хэсэг */}
         <Box sx={{ marginBottom: 2 }}>
           <Rating
             name="rating"
-            value={rating}
-            onChange={(event, newValue) => setRating(newValue)} // Update rating
-            precision={0.5} // Allow half-star ratings
-            size="large" // Larger star size
+            value={rating} // Үнэлгээг харуулна
+            onChange={(event, newValue) => setRating(newValue)} // Үнэлгээ сонгох үед хадгална
+            precision={0.5} // 0.5 одоор үнэлгээ өгнө
+            size="large" // Үндсэн хэмжээ томоор гарна
           />
         </Box>
 
-        {/* Comment Input */}
+        {/* Сэтгэгдэл бичих хэсэг */}
         <TextField
           autoFocus
           multiline
-          rows={4}
+          rows={4} 
           fullWidth
-          variant="outlined"
-          label="Таны сэтгэгдэл"
-          value={comment}
+          variant="outlined" 
+          label="Таны сэтгэгдэл" 
+          value={comment} 
           onChange={(e) => setComment(e.target.value)}
           sx={{ marginBottom: 2 }}
         />
       </DialogContent>
       <DialogActions sx={{ gap: 3 }}>
+        {/* Модал хаах товч */}
         <Button
           onClick={handleModal}
           sx={{
-            color: "black", // White text color
-            border: "1px solid white", // White border
-            backgroundColor: "transparent", // Transparent background
+            color: "black", 
+            border: "1px solid white", 
+            backgroundColor: "transparent",
             "&:hover": {
-              backgroundColor: "darkgrey", // Black background on hover
+              backgroundColor: "darkgrey",
             },
           }}
         >
           Хаах
         </Button>
 
+        {/* Сэтгэгдэл хадгалах товч */}
         <Button
           onClick={handleSave}
-          disabled={loading} // Disable button while loading
+          disabled={loading}
           sx={{
-            backgroundColor: "black", // Black background
-            color: "white", // White text color
+            backgroundColor: "black", 
+            color: "white", 
             "&:hover": {
-              backgroundColor: "darkgrey",
+              backgroundColor: "darkgrey", 
             },
           }}
         >
-          {loading ? "Хадгалаж байна..." : "Хадгалах"}
+          {loading ? "Хадгалаж байна..." : "Хадгалах"} {/* Хэрэв хадгалж байгаа бол, "Хадгалаж байна..." гэж бичнэ */}
         </Button>
       </DialogActions>
     </Dialog>
