@@ -40,7 +40,7 @@ const CheckoutPage = () => {
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
   const { user } = useUser();
-  const { fetchCartCount } = useCart(); // Now fetchCartCount is available
+  const { getCartCount } = useCart();
 
   const paymentMethods = [
     {
@@ -165,9 +165,8 @@ const CheckoutPage = () => {
         setSnackbarMessage("Захиалга амжилттай хүлээн авлаа!");
         setSnackbarSeverity("success");
         setOpenSnackbar(true);
-        // fetchCartCount();
         setActiveStep(steps.length - 1);
-        fetchCartCount();
+        getCartCount();
       } else {
         setSnackbarMessage(
           "Захиалга илгээхэд алдаа гарлаа. Дахин оролдоно уу."

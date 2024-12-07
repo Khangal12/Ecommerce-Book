@@ -5,16 +5,15 @@ const CartContext = createContext();
 
 // CartProvider component
 export const CartProvider = ({ children }) => {
-  const [cartItems, setCartItems] = useState(0); // Local state for the cart count
+  const [cartItems, setCartItems] = useState(0);
   const { user } = useUser();
 
-  const fetchCartCount = async () => {
+  const getCartCount = async () => {
     try {
       const response = await fetch(`http://127.0.0.1:5000/cart/count/${user.id}/`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          // Add any authentication token if needed
         },
       });
       const data = await response.json();
@@ -26,7 +25,7 @@ export const CartProvider = ({ children }) => {
   
   useEffect(() => {
     if (user) {
-      fetchCartCount();
+      getCartCount();
     }
   }, [user]); // Runs only once when the component mounts
 
@@ -42,7 +41,7 @@ export const CartProvider = ({ children }) => {
         });
 
         if (response.ok) {
-          fetchCartCount()
+          getCartCount()
         } else {
           console.error("Failed to add item to cart");
         }
@@ -53,7 +52,7 @@ export const CartProvider = ({ children }) => {
   };
 
   return (
-    <CartContext.Provider value={{ cartItems, addToCart,fetchCartCount }}>
+    <CartContext.Provider value={{ cartItems, addToCart,getCartCount }}>
       {children}
     </CartContext.Provider>
   );

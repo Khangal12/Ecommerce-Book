@@ -1,3 +1,5 @@
+import logging
+from logging.handlers import RotatingFileHandler
 import os
 from flask import Flask, request, jsonify, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
@@ -14,7 +16,7 @@ from backend.routes.cart import cart_bp
 from dotenv import load_dotenv
 from flask_cors import CORS
 
-load_dotenv() 
+load_dotenv()
 migrate = Migrate()
 
 def create_app(config_name="development"):
@@ -26,14 +28,14 @@ def create_app(config_name="development"):
         return send_from_directory(os.path.join(app.root_path, 'files', 'book_images'), filename)
 
     # Enable CORS
-    CORS(app, origins=["http://localhost:3000","http://localhost:3001"])
-    CORS(admin_bp, origins=["http://localhost:3000","http://localhost:3001"])
-    CORS(login_bp,origins=["http://localhost:3000","http://localhost:3001"])
-    CORS(filter_bp,origins=["http://localhost:3000","http://localhost:3001"])
-    CORS(detail_bp, origins=["http://localhost:3000","http://localhost:3001"])    
-    CORS(book_bp,origins=["https://localhost:3000","http://localhost:3001"])
-    CORS(user_settings_bp,origins=["https://localhost:3000","http://localhost:3001"])    
-    CORS(cart_bp,origins=["https://localhost:3000","http://localhost:3001"])
+    CORS(app, origins=["http://localhost:3000", "http://localhost:3001"])
+    CORS(admin_bp, origins=["http://localhost:3000", "http://localhost:3001"])
+    CORS(login_bp, origins=["http://localhost:3000", "http://localhost:3001"])
+    CORS(filter_bp, origins=["http://localhost:3000", "http://localhost:3001"])
+    CORS(detail_bp, origins=["http://localhost:3000", "http://localhost:3001"])    
+    CORS(book_bp, origins=["https://localhost:3000", "http://localhost:3001"])
+    CORS(user_settings_bp, origins=["https://localhost:3000", "http://localhost:3001"])    
+    CORS(cart_bp, origins=["https://localhost:3000", "http://localhost:3001"])
 
     # Load configuration
     app.config.from_object(config[config_name])
@@ -50,6 +52,22 @@ def create_app(config_name="development"):
     app.register_blueprint(book_bp)
     app.register_blueprint(user_settings_bp)
     app.register_blueprint(cart_bp)
+
+    # Configure logging
+    if not os.path.exists('logs'):
+        os.makedirs('logs')
+    log_file = os.path.join('logs', 'app.log')
+
+    # Create a rotating file handler
+    file_handler = RotatingFileHandler(log_file, maxBytes=10240, backupCount=10)
+    file_handler.setLevel(logging.INFO)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    file_handler.setFormatter(formatter)
+    app.logger.addHandler(file_handler)
+
+    # Set logging level for the app logger
+    app.logger.setLevel(logging.INFO)
+    app.logger.info('Application startup')
 
     return app
 

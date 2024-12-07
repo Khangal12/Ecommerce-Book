@@ -1,0 +1,22 @@
+2024-12-08 01:10:16,353 - backend.app - INFO - Application startup
+2024-12-08 01:12:18,310 - backend.app - INFO - Application startup
+2024-12-08 01:12:35,425 - backend.app - ERROR - Error adding book: Traceback (most recent call last):
+  File "/Users/khangal/Desktop/Ecommerce Books/backend/routes/admin.py", line 51, in add_book
+    new_book = Book(
+  File "<string>", line 4, in __init__
+  File "/Users/khangal/Desktop/Ecommerce Books/backend/venv/lib/python3.9/site-packages/sqlalchemy/orm/state.py", line 567, in _initialize_instance
+    manager.dispatch.init_failure(self, args, kwargs)
+  File "/Users/khangal/Desktop/Ecommerce Books/backend/venv/lib/python3.9/site-packages/sqlalchemy/util/langhelpers.py", line 147, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/Users/khangal/Desktop/Ecommerce Books/backend/venv/lib/python3.9/site-packages/sqlalchemy/orm/state.py", line 564, in _initialize_instance
+    manager.original_init(*mixed[1:], **kwargs)
+  File "/Users/khangal/Desktop/Ecommerce Books/backend/venv/lib/python3.9/site-packages/sqlalchemy/orm/decl_base.py", line 2137, in _declarative_constructor
+    setattr(self, k, kwargs[k])
+  File "/Users/khangal/Desktop/Ecommerce Books/backend/venv/lib/python3.9/site-packages/sqlalchemy/orm/attributes.py", line 534, in __set__
+    self.impl.set(
+  File "/Users/khangal/Desktop/Ecommerce Books/backend/venv/lib/python3.9/site-packages/sqlalchemy/orm/attributes.py", line 1929, in set
+    raise TypeError(
+TypeError: Incompatible collection type: int is not list-like
+
+2024-12-08 01:39:59,584 - backend.app - INFO - Application startup
+2024-12-08 01:45:29,903 - backend.app - INFO - Application startup
