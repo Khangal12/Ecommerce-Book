@@ -169,6 +169,7 @@ const OrdersPage = () => {
                 <StyledTableCell>Захиалгын дугаар</StyledTableCell>
                 <StyledTableCell>Захиалагчийн нэр</StyledTableCell>
                 <StyledTableCell>Захиалагчийн email</StyledTableCell>
+                <StyledTableCell>Захиалагчийн утас</StyledTableCell>
                 <StyledTableCell>Огноо</StyledTableCell>
                 <StyledTableCell>Төлөв</StyledTableCell>
                 <StyledTableCell>Төлбөр</StyledTableCell>
@@ -182,6 +183,7 @@ const OrdersPage = () => {
                     <TableCell>{order.id}</TableCell>
                     <TableCell>{order.user?.name}</TableCell>
                     <TableCell>{order.user?.email}</TableCell>
+                    <TableCell>{order.user?.phone_number}</TableCell>
                     <TableCell>{formatDate(order.order_date)}</TableCell>
                     <TableCell>
                       <StatusChip status={order.status} />

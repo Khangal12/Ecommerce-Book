@@ -42,14 +42,6 @@ export default function Sidebar(width) {
           <ListItem disablePadding>
             <ListItemButton component={Link} to="/">
               <ListItemIcon>
-                <DashboardIcon />
-              </ListItemIcon>
-              <ListItemText primary="Dashboard" />
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton component={Link} to="/products">
-              <ListItemIcon>
                 <ShoppingCartIcon />
               </ListItemIcon>
               <ListItemText primary="Products" />
@@ -61,14 +53,6 @@ export default function Sidebar(width) {
                 <ListAltIcon />
               </ListItemIcon>
               <ListItemText primary="Orders" />
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton component={Link} to="/settings">
-              <ListItemIcon>
-                <SettingsIcon />
-              </ListItemIcon>
-              <ListItemText primary="Settings" />
             </ListItemButton>
           </ListItem>
         </List>

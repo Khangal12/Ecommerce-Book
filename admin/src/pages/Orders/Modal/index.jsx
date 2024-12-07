@@ -68,10 +68,14 @@ const OrderDetailsModal = ({ open, onClose, order }) => {
               {order.user?.email || "Мэдээлэл байхгүй"}
             </Typography>
             <Typography variant="body1">
+              <strong>Захиалагчийн утас:</strong>{" "}
+              {order.user?.phone_number || "Мэдээлэл байхгүй"}
+            </Typography>
+            <Typography variant="body1">
               <strong>Огноо:</strong> {order.order_date || "Мэдээлэл байхгүй"}
             </Typography>
             <Typography variant="body1">
-              <strong>Төлөв:</strong> {order.status || "Мэдээлэл байхгүй"}
+              <strong>Төлөв:</strong> {order.status === "pending" ? "Хүлээгдэж буй" : "Хүргэгдсэн"}
             </Typography>
             <Typography variant="body1">
               <strong>Төлбөр:</strong> {Math.round(order.total_price)}₮
