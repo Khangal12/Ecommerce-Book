@@ -1,117 +1,241 @@
-// src/pages/Orders.js
-import React from "react";
-import DataTable from "../../components/DataTable";
-import { Box } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import {
+  Container,
+  Typography,
+  TextField,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+  Box,
+  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Pagination,
+} from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { styled } from "@mui/material/styles";
+import OrderDetailsModal from "./Modal";
 
-const columns = [
-  { field: "id", headerName: "Book ID", width: 100 },
-  { field: "name", headerName: "Book Name", width: 150 },
-  { field: "date", headerName: "Published Date", width: 130 },
-  { field: "price", headerName: "Price", width: 130 },
-  { field: "size", headerName: "Size", width: 130 },
-  { field: "author", headerName: "Book Author", width: 130 },
-  { field: "category", headerName: "Category", width: 130 },
-];
+// Styled components
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  fontWeight: "bold",
+  color: theme.palette.text.primary,
+}));
 
-const rows = [
-  {
-    id: 1,
-    name: "The Great Gatsby",
-    date: "1925-04-10",
-    price: "$10.99",
-    size: "Small",
-    author: "F. Scott Fitzgerald",
-    category: "Fiction",
-  },
-  {
-    id: 2,
-    name: "1984",
-    date: "1949-06-08",
-    price: "$14.99",
-    size: "Medium",
-    author: "George Orwell",
-    category: "Dystopian",
-  },
-  {
-    id: 3,
-    name: "To Kill a Mockingbird",
-    date: "1960-07-11",
-    price: "$18.99",
-    size: "Large",
-    author: "Harper Lee",
-    category: "Historical Fiction",
-  },
-  {
-    id: 4,
-    name: "The Catcher in the Rye",
-    date: "1951-07-16",
-    price: "$12.99",
-    size: "Medium",
-    author: "J.D. Salinger",
-    category: "Classics",
-  },
-  {
-    id: 5,
-    name: "Moby-Dick",
-    date: "1851-10-18",
-    price: "$22.99",
-    size: "Large",
-    author: "Herman Melville",
-    category: "Adventure",
-  },
-  {
-    id: 6,
-    name: "The Hobbit",
-    date: "1937-09-21",
-    price: "$15.99",
-    size: "Small",
-    author: "J.R.R. Tolkien",
-    category: "Fantasy",
-  },
-  {
-    id: 7,
-    name: "Pride and Prejudice",
-    date: "1813-01-28",
-    price: "$9.99",
-    size: "Medium",
-    author: "Jane Austen",
-    category: "Romance",
-  },
-  {
-    id: 8,
-    name: "War and Peace",
-    date: "1869-01-01",
-    price: "$25.99",
-    size: "Large",
-    author: "Leo Tolstoy",
-    category: "Historical Fiction",
-  },
-  {
-    id: 9,
-    name: "Brave New World",
-    date: "1932-08-31",
-    price: "$13.99",
-    size: "Medium",
-    author: "Aldous Huxley",
-    category: "Science Fiction",
-  },
-  {
-    id: 10,
-    name: "Fahrenheit 451",
-    date: "1953-10-19",
-    price: "$11.99",
-    size: "Small",
-    author: "Ray Bradbury",
-    category: "Dystopian",
-  },
-];
+const StatusChip = ({ status }) => {
+  let color = "default";
+  let label = "";
 
-function Orders() {
+  if (status === "success") {
+    color = "success";
+    label = "Хүргэгдсэн";
+  } else if (status === "pending") {
+    color = "warning";
+    label = "Хүлээгдэж буй";
+  } else if (status === "canceled") {
+    color = "error";
+    label = "Цуцлагдсан";
+  } else {
+    label = "Тодорхойгүй";
+  }
+
+  return <Chip label={label} color={color} variant="outlined" />;
+};
+
+const OrdersPage = () => {
+  const navigate = useNavigate();
+  const [orders, setOrders] = useState([]);
+  const [filteredOrders, setFilteredOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [openModal, setOpenModal] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState({});
+  const [search, setSearch] = useState("");
+  const [selectedOrder, setSelectedOrder] = useState({})
+
+  useEffect(() => {
+    fetchOrders(currentPage, search);
+  }, [currentPage]); // Trigger fetch when user or page changes
+
+  const fetchOrders = async (page = 1, search = "") => {
+    try {
+      const response = await axios.get(`http://127.0.0.1:5000/admin/orders/`, {
+        params: {
+          page,
+          limit: 10, // Number of items per page
+        },
+      });
+      const { items, pagination } = response.data;
+      setOrders(items);
+      setPagination(pagination); // Save pagination data
+      filterOrders(items, search); // Apply search filter locally
+      setLoading(false);
+    } catch (err) {
+      setError("Failed to fetch orders");
+      setLoading(false);
+    }
+  };
+
+  const filterOrders = (orders, search) => {
+    if (search) {
+      const filtered = orders.filter(
+        (order) =>
+          order.title.toLowerCase().includes(search.toLowerCase()) ||
+          order.author.toLowerCase().includes(search.toLowerCase())
+      );
+      setFilteredOrders(filtered);
+    } else {
+      setFilteredOrders(orders); // No search, show all orders
+    }
+  };
+
+  const handleSearchChange = (e) => {
+    const searchValue = e.target.value;
+    setSearch(searchValue); // Update search state
+    filterOrders(orders, searchValue); // Filter orders on search change
+    setCurrentPage(1); // Reset page to 1 when search changes
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
+
+  const handlePageChange = (event, newPage) => {
+    setCurrentPage(newPage);
+  };
+
+  const formatDate = (dateString) => {
+    const options = { year: "numeric", month: "2-digit", day: "2-digit" };
+    return new Intl.DateTimeFormat("mn-MN", options).format(
+      new Date(dateString)
+    );
+  };
+
+  const handleDetailClick = (order) => {
+    setSelectedOrder(order)
+    setOpenModal(!openModal)
+  };
+
+  const changeOrder = async (id) => {
+    try {
+      const response = await axios.put(`http://127.0.0.1:5000/admin/orders/${id}/`);
+      fetchOrders(currentPage,search)
+    } catch (err) {
+      setError("Failed to fetch orders");
+      setLoading(false);
+    }
+  };
+  
+  const handleStatusClick = (orderId) => {
+    changeOrder(orderId)
+  };
+  
+
   return (
-    <Box>
-      <DataTable rows={rows} columns={columns} />
-    </Box>
-  );
-}
+    <Container maxWidth="lg">
+      <Typography variant="body3" gutterBottom>
+        Захиалга
+      </Typography>
+      <Box sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}>
+        <TextField
+          label="Номны нэрээр хайх"
+          variant="outlined"
+          value={search}
+          onChange={handleSearchChange}
+          fullWidth
+          size="small"
+          sx={{ maxWidth: "400px" }}
+        />
+      </Box>
+      {loading ? (
+        <Typography>Loading...</Typography>
+      ) : error ? (
+        <Typography color="error">{error}</Typography>
+      ) : (
+        <TableContainer component={Paper} elevation={3} sx={{marginTop:2}}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <StyledTableCell>Захиалгын дугаар</StyledTableCell>
+                <StyledTableCell>Захиалагчийн нэр</StyledTableCell>
+                <StyledTableCell>Захиалагчийн email</StyledTableCell>
+                <StyledTableCell>Огноо</StyledTableCell>
+                <StyledTableCell>Төлөв</StyledTableCell>
+                <StyledTableCell>Төлбөр</StyledTableCell>
+                <StyledTableCell>Үйлдэл</StyledTableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {filteredOrders.length > 0 ? (
+                filteredOrders.map((order) => (
+                  <TableRow key={order.id}>
+                    <TableCell>{order.id}</TableCell>
+                    <TableCell>{order.user?.name}</TableCell>
+                    <TableCell>{order.user?.email}</TableCell>
+                    <TableCell>{formatDate(order.order_date)}</TableCell>
+                    <TableCell>
+                      <StatusChip status={order.status} />
+                    </TableCell>
+                    <TableCell>{Math.round(order.total_price)}₮</TableCell>
+                    <TableCell>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        size="small"
+                        sx={{ mr: 1 }}
+                        onClick={() => handleDetailClick(order)}
+                      >
+                        Дэлгэрэнгүй
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        color="dark"
+                        size="small"
+                        onClick={() => handleStatusClick(order.id)}
+                        disabled={order.status==='success'}
+                      >
+                        Хүргэсэн
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={8} align="center">
+                    Захиалга байхгүй.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
 
-export default Orders;
+      {/* Pagination Control */}
+      {pagination.total_pages > 1 && (
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
+          <Pagination
+            count={pagination.total_pages}
+            page={currentPage}
+            onChange={handlePageChange}
+            color="primary"
+            siblingCount={1}
+          />
+        </Box>
+      )}
+      {openModal && <OrderDetailsModal open={openModal} onClose={handleCloseModal} order={selectedOrder}/>}
+    </Container>
+  );
+};
+
+export default OrdersPage;

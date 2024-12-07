@@ -1,5 +1,7 @@
 from flask import Flask, jsonify, request, Blueprint, current_app
 from backend.models import db, Cart, CartItem, Book, Order,OrderItem
+from sqlalchemy.orm import joinedload
+from sqlalchemy import or_
 import traceback
 import os
 import json
@@ -278,3 +280,91 @@ def add_order():
                 "error": str(e),
             }), 500
 
+@cart_bp.route('/orders/<int:pk>/', methods=["GET"])
+def get_orders(pk):
+    try:
+        # Get the page number and search term from query parameters
+        page = request.args.get('page', 1, type=int)  # Default to 1 if no page is provided
+        limit = request.args.get('limit', 10, type=int)  # Default to 10 items per page
+
+        # Filter orders by user_id (pk) and search by book title or author
+        query = Order.query.filter_by(user_id=pk).order_by(Order.order_date.desc())
+
+        # Paginate the orders
+        orders_paginated = query.paginate(page=page, per_page=limit, error_out=False)
+
+        
+        orders = orders_paginated.items
+        total_pages = orders_paginated.pages
+        total_items = orders_paginated.total
+
+        if not orders:
+            return jsonify({
+                "status": "success",
+                "message": "Захиалга байхгүй",
+                "items": [],
+                "pagination": {
+                    "total_pages": total_pages,
+                    "total_items": total_items,
+                    "current_page": page
+                }
+            }), 200
+
+        # Prepare the data to return
+        items = []
+        for order in orders:
+            # Fetch the associated items and book details
+            order_items = OrderItem.query.options(joinedload(OrderItem.book)).filter_by(order_id=order.id).all()
+
+            for item in order_items:
+                book = item.book
+                if book:
+                    image_url = book.image_url
+                    if not image_url.startswith('http'):
+                        image_url = os.path.join(BASE_URL, image_url)
+
+                    items.append({
+                        "id": item.id,
+                        "book_id": item.book_id,
+                        "quantity": item.quantity,
+                        "price": book.price,
+                        "image_url": image_url,
+                        "title": book.title,
+                        "author": book.author,
+                        "status": order.status,
+                        "total_price": order.total_price,
+                        "order_date": order.order_date
+                    })
+                else:
+                    items.append({
+                        "id": item.id,
+                        "book_id": item.book_id,
+                        "quantity": item.quantity,
+                        "price": 0,
+                        "image_url": "",
+                        "title": "Unknown Book",
+                        "author": "Unknown Author",
+                        "status": order.status,
+                        "total_price": order.total_price,
+                        "order_date": order.order_date
+                    })
+
+        return jsonify({
+            "status": "success",
+            "message": "Order items retrieved successfully",
+            "items": items,
+            "pagination": {
+                "total_pages": total_pages,
+                "total_items": total_items,
+                "current_page": page
+            }
+        }), 200
+
+    except Exception as e:
+        # Log the error and return a response
+        current_app.logger.error(f"Error retrieving order items: {traceback.format_exc()}")
+        return jsonify({
+            "status": "error",
+            "message": "Error retrieving order items",
+            "error": str(e),
+        }), 500

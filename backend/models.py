@@ -30,6 +30,22 @@ class Order(db.Model):
 
     user = db.relationship('User', backref=db.backref('orders', lazy=True))
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'order_date': self.order_date.isoformat(),  # Convert datetime to ISO format
+            'status': self.status,
+            'total_price': str(self.total_price),  # Convert Numeric to string (to avoid serialization issues)
+            'address': self.address,
+            'user': {
+                'id': self.user.id,
+                'name': self.user.username,  # Assuming the User model has 'name' attribute
+                'email': self.user.email, 
+                'phone_number': self.user.phone_number # Assuming the User model has 'email' attribute
+            }
+        }
+
 class OrderItem(db.Model):
     __tablename__ = 'order_item'
     
