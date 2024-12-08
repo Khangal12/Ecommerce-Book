@@ -41,13 +41,13 @@ const Header = () => {
   const getTabValue = () => {
     switch (location.pathname) {
       case "/books":
-        return "2";
+        return "2";//Номын хуудас луу шилжих
       case "/":
-        return "1";
+        return "1";//Нүүр хуудас луу шилжих
       case "/orders":
-        return "3";
+        return "3";//Захиалга луу шилжих
       default:
-        return "1"; // Default to home page
+        return "1"; // Эхлэхдээ нүүр хуудас уу шилжих
     }
   };
 

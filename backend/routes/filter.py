@@ -8,14 +8,14 @@ filter_bp = Blueprint('filter', __name__)
 def get_categories():
     with current_app.app_context():
         try:
-            # Fetch all categories
+            # Бүх категориудыг татаж авах
             categories = Category.query.all()
             category_list = [{"id": category.id, "name": category.name} for category in categories]
 
-            # Fetch distinct authors from the Book model (assuming 'author' is a string field)
+            # Book моделийн distinct авторуудыг татаж авах (author field нь string гэж үзсэн)
             authors = db.session.query(Book.author).distinct().all()
 
-            # Extract the author names from the query result
+            # Авторын нэрсийг татаж авсан үр дүнгээс гаргаж авах
             author_list = [author[0] for author in authors]
 
             return jsonify({
@@ -25,10 +25,11 @@ def get_categories():
             }), 200
 
         except Exception as e:
-            current_app.logger.error(f"Error while fetching categories: {traceback.format_exc()}")
+            # Алдаа гарсан тохиолдолд алдааны мэдээллийг тэмдэглэх
+            current_app.logger.error(f"Категориудыг татах үед алдаа гарлаа: {traceback.format_exc()}")
             return jsonify({
                 "status": "error",
-                "message": "An error occurred while fetching categories",
+                "message": "Категориудыг татах явцад алдаа гарлаа",
                 "error": str(e)
             }), 500
 
@@ -36,6 +37,7 @@ def get_categories():
 def get_filtered_books():
     with current_app.app_context():
         try:
+            # Автор болон категориудаар шүүгдсэн номнуудыг татаж авах
             author_filter = request.args.getlist('author')
             category_filter = request.args.getlist('category')
             price_range=request.args.get('priceRange')
@@ -44,29 +46,32 @@ def get_filtered_books():
 
             query = Book.query
 
+            # Автор шүүлт хийх
             if author_filter and any(author_filter):
                 query = query.filter(Book.author.in_(author_filter))
             
+            # Категори шүүлт хийх
             if category_filter and any(category_filter):
                 query = query.filter(Book.categories.any(Category.id.in_(category_filter)))
             
+            # Үнэ шүүлт хийх
             if price_range:
-                # Split the price range string by comma (e.g., "7970,500000")
                 try:
+                    # Үнэний диапазоныг салгах (e.g., "7970,500000")
                     price_min, price_max = map(float, price_range.split(','))
                     query = query.filter(Book.price >= price_min, Book.price <= price_max)
                 except ValueError:
-                    # Handle the case where the price range is not in the correct format
+                    # Үнэний формат буруу байвал алдаа буцаах
                     return jsonify({
                         "status": "error",
-                        "message": "Invalid price range format. Please use 'minPrice,maxPrice'."
+                        "message": "Үнэний формат буруу байна. 'minPrice,maxPrice' гэж бичнэ үү."
                     }), 400
 
-            # Execute the query
-            total_books = query.with_entities(Book.id).count()  # Count only IDs to speed up the process
+            # Query-г гүйцэтгэх
+            total_books = query.with_entities(Book.id).count()  # ID-гаар тоолох (илүү хурдан)
             total_pages = (total_books + limit - 1) // limit
 
-            # Paginate: Limit and offset based on current page
+            # Хуудаслалт: Одоогийн хуудаснаас шалтгаалан limit, offset тохируулах
             books = query.offset((page - 1) * limit).limit(limit).all()
             books_data = [book.to_dict() for book in books]
 
@@ -79,10 +84,11 @@ def get_filtered_books():
             }), 200
 
         except Exception as e:
-            current_app.logger.error(f"Error while fetching filtered books: {traceback.format_exc()}")
+            # Алдаа гарсан тохиолдолд алдааны мэдээллийг тэмдэглэх
+            current_app.logger.error(f"Шүүгдсэн номнуудыг татах явцад алдаа гарлаа: {traceback.format_exc()}")
             return jsonify({
                 "status": "error",
-                "message": "An error occurred while fetching books",
+                "message": "Номнуудыг татах явцад алдаа гарлаа",
                 "error": str(e)
             }), 500
 
@@ -90,12 +96,14 @@ def get_filtered_books():
 def get_one_book(id):
     with current_app.app_context():
         try:
+            # Номыг ID-аар татаж авах
             book = Book.query.get(id)
             
             if not book:
+                # Ном олдоогүй тохиолдолд алдаа буцаах
                 return jsonify({
                     "status": "error",
-                    "message": f"Book with ID {id} not found."
+                    "message": f"ID {id} дугаартай ном олдсонгүй."
                 }), 404
             
             book_data = book.to_dict()
@@ -106,10 +114,11 @@ def get_one_book(id):
             }), 200
 
         except Exception as e:
-            current_app.logger.error(f"Error while fetching book with ID {id}: {traceback.format_exc()}")
+            # Алдаа гарсан тохиолдолд алдааны мэдээллийг тэмдэглэх
+            current_app.logger.error(f"ID {id} дугаартай номыг татах үед алдаа гарлаа: {traceback.format_exc()}")
             return jsonify({
                 "status": "error",
-                "message": "An error occurred while fetching the book",
+                "message": "Номыг татах явцад алдаа гарлаа",
                 "error": str(e)
             }), 500
 
@@ -117,17 +126,20 @@ def get_one_book(id):
 def get_recommendations(id):
     with current_app.app_context():
         try:
+            # Номыг ID-аар татаж авах
             book = Book.query.get(id)
             
             if not book:
+                # Ном олдоогүй тохиолдолд алдаа буцаах
                 return jsonify({
                     "status": "error",
-                    "message": f"Book with ID {id} not found."
+                    "message": f"ID {id} дугаартай ном олдсонгүй."
                 }), 404
             
+            # санал болгох ном
             recommendations = Book.query.filter(
-                Book.categories.any(Category.id.in_([cat.id for cat in book.categories])),  # Check for matching categories
-                Book.id != id  # Exclude the current book
+                Book.categories.any(Category.id.in_([cat.id for cat in book.categories])),  # Адилхан категориудыг шүүх
+                Book.id != id  # Одоогийн номыг хасах
             ).limit(5).all()
 
             recommendation_data = [rec.to_dict() for rec in recommendations]
@@ -138,10 +150,10 @@ def get_recommendations(id):
             }), 200
 
         except Exception as e:
-            current_app.logger.error(f"Error while fetching book with ID {id}: {traceback.format_exc()}")
+            # Алдаа гарсан тохиолдолд алдааны мэдээллийг тэмдэглэх
+            current_app.logger.error(f"ID {id} дугаартай номыг татах үед алдаа гарлаа: {traceback.format_exc()}")
             return jsonify({
                 "status": "error",
-                "message": "An error occurred while fetching the book",
+                "message": "Номыг татах явцад алдаа гарлаа",
                 "error": str(e)
             }), 500
-

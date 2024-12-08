@@ -9,7 +9,7 @@ class User(db.Model):
     __tablename__ = 'user'
     
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String, nullable=False, unique=True)
+    userame = db.Column(db.String, nullable=False, unique=True)
     email = db.Column(db.String, nullable=False, unique=True)
     password = db.Column(db.String, nullable=False)
     address = db.Column(db.String)
@@ -34,15 +34,15 @@ class Order(db.Model):
         return {
             'id': self.id,
             'user_id': self.user_id,
-            'order_date': self.order_date.isoformat(),  # Convert datetime to ISO format
+            'order_date': self.order_date.isoformat(),  
             'status': self.status,
-            'total_price': str(self.total_price),  # Convert Numeric to string (to avoid serialization issues)
+            'total_price': str(self.total_price),  
             'address': self.address,
             'user': {
                 'id': self.user.id,
-                'name': self.user.username,  # Assuming the User model has 'name' attribute
+                'name': self.user.username, 
                 'email': self.user.email, 
-                'phone_number': self.user.phone_number # Assuming the User model has 'email' attribute
+                'phone_number': self.user.phone_number 
             }
         }
 

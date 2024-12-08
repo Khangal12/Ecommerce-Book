@@ -10,22 +10,27 @@ BASE_URL = "http://127.0.0.1:5000/"
 
 admin_bp = Blueprint('admin', __name__)
 
+# Ном нэмэх API
 @admin_bp.route('/admin/add_book/', methods=['POST'])
 def add_book():
     with current_app.app_context(): 
-        data = request.form
-        image = request.files.get('file')
-        published_date = data.get('publishedDate')
-        category_names = data.getlist('category')
+        data = request.form  # Хүснэгтээс ирсэн өгөгдөл авах
+        image = request.files.get('file')  # Зураг оруулах
+        published_date = data.get('publishedDate')  # Нийтлэгдсэн огноо авах
+        category_names = data.getlist('category')  # Ангиллын нэрс авах
 
         try:
+            # Огноог зөв формат руу хөрвүүлэх
             published_date = datetime.datetime.strptime(published_date, "%Y-%m-%d")
+            # Зургийн нэрийг оноож хадгалах
             image_filename = f"{datetime.datetime.now().timestamp()}_{image.filename}"
+            # Фолдерыг үүсгэх эсэхийг шалгах
             os.makedirs(UPLOAD_FOLDER, exist_ok=True)
             image_path = os.path.join(UPLOAD_FOLDER, image_filename)
-            image.save(image_path)
+            image.save(image_path)  # Зургийг хадгалах
             image_url = image_path
 
+            # Ангиллыг шалгах, хэрэв байхгүй бол шинээр үүсгэх
             categories = []
             for category_name in category_names:
                 category = Category.query.filter_by(name=category_name).first()
@@ -35,6 +40,7 @@ def add_book():
                     db.session.commit()
                 categories.append(category)
 
+            # Шинэ ном үүсгэх
             new_book = Book(
                 title=data['name'],
                 author=data['author'],
@@ -46,70 +52,77 @@ def add_book():
                 categories=categories
             )
 
-            db.session.add(new_book)
+            db.session.add(new_book)  # Өгөгдлийг хадгалах
             db.session.commit()
 
             return jsonify({"status": "success", "message": "Ном амжилттай нэмэгдлээ", "book": new_book.to_dict()}), 200
 
         except Exception as e:
+            # Алдааг бүртгэж, хэрэглэгчид буцаах
             current_app.logger.error(f"Error adding book: {traceback.format_exc()}")
             return jsonify({"message": "Error saving the book", "error": str(e)}), 500
 
+# Номнуудыг авах API
 @admin_bp.route('/admin/books/', methods=["GET"])
 def get_books():
     with current_app.app_context():
         try:
-            books = Book.query.all()
+            books = Book.query.all()  # Бүх номнуудыг авах
 
-            books_data = [book.to_dict() for book in books]
+            books_data = [book.to_dict() for book in books]  # Номнуудын жагсаалтыг үүсгэх
 
             return jsonify({"status": "success", "message": "", "books": books_data}), 200
 
         except Exception as e:
+            # Алдааг бүртгэж, хэрэглэгчид буцаах
             current_app.logger.error(f"Error retrieving books: {traceback.format_exc()}")
             return jsonify({"status": "error", "message": "Error saving the book", "error": str(e)}), 500
-        
+
+# Ном устгах API
 @admin_bp.route('/admin/delete_book/<int:book_id>/', methods=["DELETE"])
 def delete_book(book_id):
     with current_app.app_context():
         try:
-            book = Book.query.get(book_id)
+            book = Book.query.get(book_id)  # Номын ID-аар хайлт хийх
             if not book:
-                return jsonify({"message": "Book not found"}), 404
+                return jsonify({"message": "Book not found"}), 404  # Хэрэв ном олдохгүй бол
 
+            # Хуучин зургийг устгах
             if book.image_url and os.path.exists(book.image_url):
                 os.remove(book.image_url)
 
-            db.session.delete(book)
+            db.session.delete(book)  # Номыг устгах
             db.session.commit()
 
-            return jsonify({"status": "success","message": "Ном амжилттай устгагдалаа"}), 200
+            return jsonify({"status": "success", "message": "Ном амжилттай устгагдалаа"}), 200
 
         except Exception as e:
+            # Алдааг бүртгэж, хэрэглэгчид буцаах
             current_app.logger.error(f"Error deleting book: {traceback.format_exc()}")
             return jsonify({"message": "Error deleting the book", "error": str(e)}), 500
 
+# Ном засах API
 @admin_bp.route('/admin/edit_book/<int:book_id>/', methods=['PUT'])
 def edit_book(book_id):
     with current_app.app_context():
-        data = request.form
+        data = request.form  # Хүснэгтээс өгөгдөл авах
 
-        image = request.files.get('file')
-        published_date = data.get('publishedDate')
-        quantity = int(data.get('quantity'))
-        category_names = data.getlist('category')
+        image = request.files.get('file')  # Зураг солих
+        published_date = data.get('publishedDate')  # Огноо
+        quantity = int(data.get('quantity'))  # Тоо хэмжээ
+        category_names = data.getlist('category')  # Ангиллууд
 
         try:
-            book = Book.query.get(book_id)
+            book = Book.query.get(book_id)  # Ном хайх
             if not book:
                 return jsonify({"message": "Book not found"}), 404
 
-            # Update the published date
+            # Огноог шинэчлэх
             published_date = datetime.datetime.strptime(published_date, "%Y-%m-%d")
             
-            # If a new image is provided, save it
+            # Шинэ зураг байвал хадгалах
             if image:
-                # Remove the old image if it exists
+                # Хуучин зургийг устгах
                 if book.image_url and os.path.exists(book.image_url):
                     os.remove(book.image_url)
 
@@ -119,15 +132,15 @@ def edit_book(book_id):
                 image.save(image_path)
                 book.image_url = image_path
 
-            # Update other fields
+            # Бусад талбаруудыг шинэчлэх
             book.title = data['name']
             book.author = data['author']
             book.price = float(data['price'])
             book.published_date = published_date
             book.description = data.get('description')
-            book.stock_quantity =quantity
+            book.stock_quantity = quantity
 
-            # Update categories
+            # Ангиллыг шинэчлэх
             categories = []
             for category_name in category_names:
                 category = Category.query.filter_by(name=category_name).first()
@@ -143,24 +156,23 @@ def edit_book(book_id):
             return jsonify({"status": "success", "message": "Ном амжилттай засагдлаа", "book": book.to_dict()}), 200
 
         except Exception as e:
+            # Алдааг бүртгэж, хэрэглэгчид буцаах
             current_app.logger.error(f"Error updating book: {traceback.format_exc()}")
-            return jsonify({"status": "error" , "message": "Error updating the book", "error": str(e)}), 500
+            return jsonify({"status": "error", "message": "Error updating the book", "error": str(e)}), 500
 
+# Захиалгыг авах API
 @admin_bp.route('/admin/orders/', methods=['GET'])
 def get_order():
     try:
-        # Get the page number and search term from query parameters
-        page = request.args.get('page', 1, type=int)  # Default to 1 if no page is provided
-        limit = request.args.get('limit', 10, type=int)  # Default to 10 items per page
+        # Хуудасны дугаар болон хязгаарын утгуудыг авах
+        page = request.args.get('page', 1, type=int)
+        limit = request.args.get('limit', 10, type=int)
 
-        # Filter orders by user_id (pk) and search by book title or author
+        # Захиалгуудыг хуудаслаж авах
         query = Order.query.order_by(Order.order_date.desc())
-
-        # Paginate the orders
         orders_paginated = query.paginate(page=page, per_page=limit, error_out=False)
 
-        
-        orders = [order.to_dict() for order in orders_paginated.items]
+        orders = [order.to_dict() for order in orders_paginated.items]  # Захиалгуудын жагсаалт үүсгэх
         total_pages = orders_paginated.pages
         total_items = orders_paginated.total
 
@@ -176,10 +188,9 @@ def get_order():
                 }
             }), 200
 
-
         return jsonify({
             "status": "success",
-            "message": "Order items retrieved successfully",
+            "message": "Захиалгууд амжилттай авлаа",
             "items": orders,
             "pagination": {
                 "total_pages": total_pages,
@@ -189,19 +200,19 @@ def get_order():
         }), 200
 
     except Exception as e:
-        # Log the error and return a response
+        # Алдааг бүртгэж, хэрэглэгчид буцаах
         current_app.logger.error(f"Error retrieving order items: {traceback.format_exc()}")
         return jsonify({
             "status": "error",
             "message": "Error retrieving order items",
             "error": str(e),
         }), 500
-    
+
+# Захиалгын төлвийг солих API
 @admin_bp.route('/admin/orders/<int:pk>/', methods=['PUT'])
 def change_status(pk):
     try:
-
-        order = Order.query.get(pk)
+        order = Order.query.get(pk)  # Захиалга хайх
 
         if not order:
             return jsonify({
@@ -209,58 +220,19 @@ def change_status(pk):
                 "message": "Захиалга байхгүй",
             }), 404
 
-        order.status = "success"
+        order.status = "success"  # Төлөв солих
         db.session.commit()
 
         return jsonify({
             "status": "success",
-            "message": "Амжилттай хүргэгдсэн",
+            "message": "Захиалгын төлөв солигдлоо",
         }), 200
 
     except Exception as e:
-        # Log the error and return a response
-        current_app.logger.error(f"Төлөв солиход алдаа: {traceback.format_exc()}")
+        # Алдааг бүртгэж, хэрэглэгчид буцаах
+        current_app.logger.error(f"Error changing order status: {traceback.format_exc()}")
         return jsonify({
             "status": "error",
-            "message": "Алдаа",
-            "error": str(e),
-        }), 500
-
-@admin_bp.route('/admin/orders/<int:pk>/', methods=['GET'])
-def get_orderDetail(pk):
-    try:
-        # Filter orders by user_id (pk) and search by book title or author
-        order = Order.query.get(pk)
-        order_items = OrderItem.query.filter_by(order_id=pk).all()
-        items_data = []
-        for item in order_items:
-            items_data.append({
-                "id":item.id,
-                "book": item.book.to_dict() if item.book else "Нэргүй",
-                "quantity": item.quantity,
-                "price": item.price,
-                "total": item.quantity * item.price,
-            })
-
-        if not items_data:
-            return jsonify({
-                "status": "success",
-                "message": "Захиалга байхгүй",
-                "items": [],
-            }), 200
-
-        return jsonify({
-            "status": "success",
-            "message": "Order items retrieved successfully",
-            "items": items_data,
-            "address": order.address if order else "Хаяг байхгүй"
-        }), 200
-
-    except Exception as e:
-        # Log the error and return a response
-        current_app.logger.error(f"Error retrieving order items: {traceback.format_exc()}")
-        return jsonify({
-            "status": "error",
-            "message": "Error retrieving order items",
+            "message": "Error changing order status",
             "error": str(e),
         }), 500

@@ -4,7 +4,7 @@ import traceback
 
 user_settings_bp = Blueprint('userSettings', __name__)
 
-# Route to save user settings (POST for creating a new user, PUT for updating an existing user)
+
 @user_settings_bp.route('/putUser/', methods=["PUT"])
 def save_user():
     data = request.get_json()
